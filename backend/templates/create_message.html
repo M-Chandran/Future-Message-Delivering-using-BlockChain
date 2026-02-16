@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Message - FutureMessage Chain</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --cosmic-bg: #0a0a1a;
+            --cosmic-bg-secondary: #12122a;
+            --cosmic-accent: #00d4ff;
+            --cosmic-purple: #a855f7;
+            --cosmic-pink: #ec4899;
+            --cosmic-gold: #fbbf24;
+            --cosmic-text: #e2e8f0;
+            --cosmic-text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --gradient-cosmic: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+            --gradient-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--cosmic-bg);
+            color: var(--cosmic-text);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Cosmic Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 130px 80px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 160px 120px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 150px;
+            animation: twinkle 8s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .nebula {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.25;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .nebula-1 {
+            top: -150px;
+            right: -100px;
+            background: radial-gradient(circle, var(--cosmic-accent) 0%, transparent 70%);
+        }
+
+        .nebula-2 {
+            bottom: -150px;
+            left: -100px;
+            background: radial-gradient(circle, var(--cosmic-purple) 0%, transparent 70%);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.1); }
+        }
+
+        /* Main Container */
+        .create-container {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* Header */
+        .page-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .page-header h1 {
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header h1 i {
+            background: var(--gradient-cosmic);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--gradient-cosmic);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--cosmic-text);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--cosmic-accent);
+        }
+
+        /* Form Card */
+        .form-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 36px;
+        }
+
+        .form-card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .form-card > p {
+            color: var(--cosmic-text-muted);
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        /* Message Type Tabs */
+        .message-type-tabs {
+            display: flex;
+            margin-bottom: 28px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 6px;
+            gap: 6px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 10px;
+            color: var(--cosmic-text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-button.active {
+            background: var(--gradient-cosmic);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .tab-button:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--cosmic-text);
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--cosmic-text);
+            font-size: 0.95rem;
+        }
+
+        .form-group input[type="datetime-local"],
+        .form-group textarea,
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: var(--cosmic-text-muted);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--cosmic-accent);
+            background: rgba(0, 212, 255, 0.05);
+            box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 8px;
+            color: var(--cosmic-text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* File Input Styling */
+        .file-input-wrapper {
+            position: relative;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-drop-zone {
+            border: 2px dashed var(--glass-border);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .file-drop-zone:hover {
+            border-color: var(--cosmic-accent);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .file-drop-zone i {
+            font-size: 2.5rem;
+            color: var(--cosmic-accent);
+            margin-bottom: 12px;
+        }
+
+        .file-drop-zone p {
+            color: var(--cosmic-text-muted);
+            font-size: 0.95rem;
+        }
+
+        .file-drop-zone span {
+            color: var(--cosmic-accent);
+            font-weight: 600;
+        }
+
+        /* File Info */
+        .file-info {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 10px;
+            display: none;
+        }
+
+        .file-info.show {
+            display: block;
+        }
+
+        .file-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: var(--cosmic-text);
+        }
+
+        .file-info-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .file-info-item i {
+            color: var(--cosmic-accent);
+            width: 20px;
+        }
+
+        .file-info-item strong {
+            color: var(--cosmic-text-muted);
+            font-weight: 500;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+            justify-content: center;
+            padding: 16px 24px;
+        }
+
+        .btn-submit {
+            background: var(--gradient-cosmic);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Info Box */
+        .info-box {
+            margin-top: 24px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .info-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--cosmic-accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-box ol {
+            padding-left: 20px;
+            color: var(--cosmic-text-muted);
+            line-height: 1.8;
+        }
+
+        .info-box li {
+            margin-bottom: 8px;
+        }
+
+        /* Message Input - Toggle */
+        .message-input, .file-input {
+            display: none;
+        }
+
+        .message-input.active, .file-input.active {
+            display: block;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .message-type-tabs {
+                flex-direction: column;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="stars"></div>
+        <div class="nebula nebula-1"></div>
+        <div class="nebula nebula-2"></div>
+    </div>
+
+    <div class="create-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-plus-circle"></i> Create Time-Locked Message</h1>
+            <div class="header-buttons">
+                <a href="/dashboard" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <a href="/logout" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <h2>Send a Message to the Future</h2>
+            <p>Create an encrypted message that will be locked until a specified date and time. The message will be stored on the blockchain and can only be revealed after the unlock time.</p>
+
+            <!-- Error Message -->
+            {% if error %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-circle"></i>
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <!-- Message Type Selection -->
+            <div class="message-type-tabs">
+                <button type="button" class="tab-button active" onclick="selectMessageType('text', event)">
+                    <i class="fas fa-comment"></i> Text
+                </button>
+                <button type="button" class="tab-button" onclick="selectMessageType('image', event)">
+                    <i class="fas fa-image"></i> Image
+                </button>
+                <button type="button" class="tab-button" onclick="selectMessageType('document', event)">
+                    <i class="fas fa-file-alt"></i> Document
+                </button>
+            </div>
+
+            <form method="POST" action="/create_message" enctype="multipart/form-data" id="messageForm" onsubmit="return submitForm(event)">
+                <input type="hidden" name="message_type" id="message_type" value="text">
+
+                <!-- Text Message Input -->
+                <div class="form-group message-input active" id="textInput">
+                    <label for="message">Your Message</label>
+                    <textarea id="message" name="message" rows="6" placeholder="Write your message here..."></textarea>
+                </div>
+
+                <!-- File Input -->
+                <div class="form-group file-input" id="fileInput">
+                    <label>Select File</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="file" name="file" accept=".txt,.pdf,.png,.jpg,.jpeg,.gif,.doc,.docx,.zip">
+                        <div class="file-drop-zone" onclick="document.getElementById('file').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click to upload or drag and drop</p>
+                            <p><span>PNG, JPG, PDF, DOC, ZIP</span></p>
+                        </div>
+                    </div>
+                    <div class="file-info" id="fileInfo">
+                        <div class="file-info-item">
+                            <i class="fas fa-file"></i>
+                            <strong>File:</strong> <span id="fileName"></span>
+                        </div>
+                        <div class="file-info-item">
+                            <i class="fas fa-weight"></i>
+                            <strong>Size:</strong> <span id="fileSize"></span>
+                        </div>
+                        <div class="file-info-item">
+                            <i class="fas fa-tag"></i>
+                            <strong>Type:</strong> <span id="fileType"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reveal_time">Unlock Date & Time</label>
+                    <input type="datetime-local" id="reveal_time" name="reveal_time" required>
+                    <small>The message will be locked until this date and time.</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-submit" id="submitBtn">
+                        <i class="fas fa-lock"></i> Create Message
+                    </button>
+                    <a href="/dashboard" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+
+            <!-- Info Box -->
+            <div class="info-box">
+                <h3><i class="fas fa-info-circle"></i> How it works:</h3>
+                <ol>
+                    <li>Your message is encrypted with AES-256 encryption</li>
+                    <li>The message hash is stored on the blockchain with proof-of-work mining</li>
+                    <li>The encrypted message is saved locally with metadata</li>
+                    <li>Only you can reveal the message after the unlock time</li>
+                    <li>The blockchain ensures the message integrity and timing</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectMessageType(type, event) {
+            // Update hidden input
+            document.getElementById('message_type').value = type;
+
+            // Update tab buttons
+            const tabs = document.querySelectorAll('.tab-button');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+
+            // Show/hide inputs
+            document.getElementById('textInput').classList.remove('active');
+            document.getElementById('fileInput').classList.remove('active');
+
+            if (type === 'text') {
+                document.getElementById('textInput').classList.add('active');
+                document.getElementById('message').required = true;
+                document.getElementById('file').required = false;
+            } else {
+                document.getElementById('fileInput').classList.add('active');
+                document.getElementById('message').required = false;
+                document.getElementById('file').required = true;
+
+                // Update file accept attribute based on type
+                const fileInput = document.getElementById('file');
+                if (type === 'image') {
+                    fileInput.accept = '.png,.jpg,.jpeg,.gif';
+                } else if (type === 'document') {
+                    fileInput.accept = '.pdf,.doc,.docx,.zip,.txt';
+                }
+            }
+        }
+
+        // File input handler
+        document.getElementById('file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileInfo = document.getElementById('fileInfo');
+                const fileName = document.getElementById('fileName');
+                const fileSize = document.getElementById('fileSize');
+                const fileType = document.getElementById('fileType');
+
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileType.textContent = getFileTypeDescription(file.name);
+
+                fileInfo.classList.add('show');
+            } else {
+                document.getElementById('fileInfo').classList.remove('show');
+            }
+        });
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileTypeDescription(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const types = {
+                'txt': 'Text Document',
+                'pdf': 'PDF Document',
+                'doc': 'Word Document',
+                'docx': 'Word Document',
+                'zip': 'ZIP Archive',
+                'png': 'PNG Image',
+                'jpg': 'JPEG Image',
+                'jpeg': 'JPEG Image',
+                'gif': 'GIF Image'
+            };
+            return types[ext] || 'Unknown File Type';
+        }
+
+        // Form validation and submission
+        async function submitForm(e) {
+            e.preventDefault();
+            
+            const messageType = document.getElementById('message_type').value;
+            const message = document.getElementById('message').value.trim();
+            const file = document.getElementById('file').files[0];
+
+            if (messageType === 'text' && !message) {
+                alert('Please enter a text message.');
+                return false;
+            }
+
+            if ((messageType === 'image' || messageType === 'document') && !file) {
+                alert('Please select a file to upload.');
+                return false;
+            }
+
+            const revealTime = document.getElementById('reveal_time').value;
+            if (!revealTime) {
+                alert('Please select an unlock date and time.');
+                return false;
+            }
+
+            const selectedDate = new Date(revealTime);
+            const now = new Date();
+            if (selectedDate <= now) {
+                alert('Unlock time must be in the future.');
+                return false;
+            }
+
+            // Show loading indicator
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            try {
+                // Submit the form
+                const form = document.getElementById('messageForm');
+                const formData = new FormData(form);
+
+                const response = await fetch('/create_message', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    // Redirect to dashboard
+                    window.location.href = '/dashboard';
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Failed to create message');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-lock"></i> Create Message';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-lock"></i> Create Message';
+            }
+
+            return false;
+        }
+    </script>
+</body>
+</html>

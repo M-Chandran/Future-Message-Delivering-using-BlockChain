@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reveal Message - Send Message to the Future</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .message-reveal {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .revealed-message {
+            font-size: 18px;
+            line-height: 1.6;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .revealed-image {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin: 20px 0;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #ff6b6b;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Message Revealed</h1>
+            <nav>
+                <a href="/dashboard" class="btn btn-secondary">Back to Dashboard</a>
+            </nav>
+        </header>
+
+        <main>
+            {% if message_type == 'text' and message %}
+            <div class="message-reveal">
+                <h2><i class="fas fa-envelope-open"></i> Your Text Message:</h2>
+                <p class="revealed-message">{{ message }}</p>
+            </div>
+            {% elif message_type == 'image' and image_data %}
+            <div class="message-reveal">
+                <h2><i class="fas fa-image"></i> Your Image:</h2>
+                <img src="data:image/png;base64,{{ image_data }}" alt="Revealed Image" class="revealed-image">
+                <br>
+                <a href="/api/download/{{ message_id }}" class="download-btn">
+                    <i class="fas fa-download"></i> Download Image
+                </a>
+            </div>
+            {% elif message_type == 'document' %}
+            <div class="message-reveal">
+                <h2><i class="fas fa-file-alt"></i> Your Document:</h2>
+                <p>Your document has been decrypted and is ready for download.</p>
+                <a href="/api/download/{{ message_id }}" class="download-btn">
+                    <i class="fas fa-download"></i> Download Document
+                </a>
+            </div>
+            {% elif error %}
+            <div class="error-message">
+                <h2><i class="fas fa-exclamation-triangle"></i> Error</h2>
+                <p>{{ error }}</p>
+            </div>
+            {% else %}
+            <div class="error-message">
+                <h2><i class="fas fa-exclamation-triangle"></i> Message Not Found</h2>
+                <p>The requested message could not be found or you don't have permission to view it.</p>
+            </div>
+            {% endif %}
+        </main>
+
+        <footer>
+            <p>&copy; 2023 Send Message to the Future. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

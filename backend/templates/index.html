@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutureMessage Chain - Send Messages to the Future</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --cosmic-bg: #0a0a1a;
+            --cosmic-bg-secondary: #12122a;
+            --cosmic-accent: #00d4ff;
+            --cosmic-purple: #a855f7;
+            --cosmic-pink: #ec4899;
+            --cosmic-gold: #fbbf24;
+            --cosmic-text: #e2e8f0;
+            --cosmic-text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --gradient-cosmic: linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%);
+            --gradient-gold: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--cosmic-bg);
+            color: var(--cosmic-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Cosmic Background */
+        .cosmic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 200px 50px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 250px 180px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 300px 100px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 350px 200px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 400px 150px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 450px 80px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 500px 220px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 550px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 600px 50px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 650px 250px;
+            animation: twinkle 8s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .nebula {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .nebula-1 {
+            top: -200px;
+            right: -100px;
+            background: radial-gradient(circle, var(--cosmic-accent) 0%, transparent 70%);
+            animation-delay: 0s;
+        }
+
+        .nebula-2 {
+            bottom: -200px;
+            left: -100px;
+            background: radial-gradient(circle, var(--cosmic-purple) 0%, transparent 70%);
+            animation-delay: -10s;
+        }
+
+        .nebula-3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, var(--cosmic-pink) 0%, transparent 70%);
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Main Container */
+        .main-container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 48px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-cosmic);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3); }
+            50% { box-shadow: 0 8px 48px rgba(0, 212, 255, 0.5), 0 0 60px rgba(168, 85, 247, 0.3); }
+        }
+
+        .logo-icon i {
+            font-size: 28px;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--gradient-cosmic);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn-nav {
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-nav-outline {
+            background: transparent;
+            border: 2px solid var(--glass-border);
+            color: var(--cosmic-text);
+        }
+
+        .btn-nav-outline:hover {
+            background: var(--glass-bg);
+            border-color: var(--cosmic-accent);
+            color: var(--cosmic-accent);
+        }
+
+        .btn-nav-primary {
+            background: var(--gradient-cosmic);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-nav-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 24px;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--cosmic-accent);
+            margin-bottom: 32px;
+            backdrop-filter: blur(10px);
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .hero-badge i {
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            max-width: 900px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title .gradient-text {
+            background: var(--gradient-cosmic);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.35rem;
+            color: var(--cosmic-text-muted);
+            max-width: 600px;
+            margin-bottom: 48px;
+            line-height: 1.7;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .btn-hero {
+            padding: 18px 40px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-hero-primary {
+            background: var(--gradient-cosmic);
+            color: white;
+            box-shadow: 0 8px 40px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 50px rgba(0, 212, 255, 0.6);
+        }
+
+        .btn-hero-secondary {
+            background: var(--glass-bg);
+            border: 2px solid var(--glass-border);
+            color: var(--cosmic-text);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-hero-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--cosmic-accent);
+            color: var(--cosmic-accent);
+            transform: translateY(-3px);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 80px 48px 120px;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-title p {
+            color: var(--cosmic-text-muted);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px 32px;
+            backdrop-filter: blur(20px);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-cosmic);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.15);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 72px;
+            height: 72px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            background: var(--gradient-cosmic);
+            border-color: transparent;
+            color: white;
+        }
+
+        .feature-icon.cyan { color: var(--cosmic-accent); }
+        .feature-icon.purple { color: var(--cosmic-purple); }
+        .feature-icon.pink { color: var(--cosmic-pink); }
+        .feature-icon.gold { color: var(--cosmic-gold); }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--cosmic-text);
+        }
+
+        .feature-card p {
+            color: var(--cosmic-text-muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 60px 48px;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.05) 100%);
+        }
+
+        .stats-grid {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            max-width: 900px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: var(--gradient-cosmic);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: var(--cosmic-text-muted);
+            font-size: 1rem;
+            margin-top: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 40px 48px;
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .footer p {
+            color: var(--cosmic-text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-header {
+                padding: 20px 24px;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .hero-title {
+                font-size: 2.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .features-section {
+                padding: 60px 24px 80px;
+            }
+
+            .stats-grid {
+                gap: 40px;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-hero {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Cosmic Background -->
+    <div class="cosmic-bg">
+        <div class="stars"></div>
+        <div class="nebula nebula-1"></div>
+        <div class="nebula nebula-2"></div>
+        <div class="nebula nebula-3"></div>
+    </div>
+
+    <div class="main-container">
+        <!-- Navigation -->
+        <nav class="nav-header">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <span class="logo-text">FutureMessage</span>
+            </div>
+            <div class="nav-buttons">
+                <a href="/login" class="btn-nav btn-nav-outline">Login</a>
+                <a href="/register" class="btn-nav btn-nav-primary">Get Started</a>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-badge">
+                <i class="fas fa-sparkles"></i>
+                <span>Powered by Blockchain Technology</span>
+            </div>
+            <h1 class="hero-title">
+                Send Messages<br>
+                <span class="gradient-text">To The Future</span>
+            </h1>
+            <p class="hero-subtitle">
+                Create encrypted time-locked messages that can only be revealed at a specific time. 
+                Your memories, wishes, and secrets - secured forever on the blockchain.
+            </p>
+            <div class="hero-buttons">
+                <a href="/register" class="btn-hero btn-hero-primary">
+                    <i class="fas fa-plus"></i>
+                    Create Your First Message
+                </a>
+                <a href="/login" class="btn-hero btn-hero-secondary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </a>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <div class="section-title">
+                <h2>Why Choose FutureMessage?</h2>
+                <p>Secure, private, and immutable - your messages are protected by cutting-edge technology</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon cyan">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <h3>End-to-End Encryption</h3>
+                    <p>Your messages are encrypted using military-grade AES-256 encryption before being stored. Only you can decrypt them.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon purple">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Time-Locked Release</h3>
+                    <p>Set a specific unlock time for your message. It will remain encrypted and secure until that moment arrives.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon pink">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <h3>Blockchain Secured</h3>
+                    <p>Message hashes are stored immutably on the Ethereum blockchain, ensuring tamper-proof storage and verification.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon gold">
+                        <i class="fas fa-cloud-arrow-up"></i>
+                    </div>
+                    <h3>Decentralized Storage</h3>
+                    <p>Your encrypted messages are stored securely. No central authority - your data stays yours forever.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon cyan">
+                        <i class="fas fa-user-secret"></i>
+                    </div>
+                    <h3>Complete Privacy</h3>
+                    <p>No personal information required. Your identity remains anonymous while your messages stay secure.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon purple">
+                        <i class="fas fa-infinity"></i>
+                    </div>
+                    <h3>Permanent Storage</h3>
+                    <p>Once created, your time-locked message exists forever on the blockchain. It cannot be deleted or modified.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">256</div>
+                    <div class="stat-label">Bit Encryption</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">永久存储</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">数据泄露</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 FutureMessage Chain. Secure messaging for tomorrow.</p>
+        </footer>
+    </div>
+</body>
+</html>
