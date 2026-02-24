@@ -553,22 +553,22 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <i class="fas fa-envelope"></i>
-                <h3 id="total-messages">{{ messages|length }}</h3>
+                <h3 id="total-messages">{{ total_messages }}</h3>
                 <p>Total Messages</p>
             </div>
             <div class="stat-card">
                 <i class="fas fa-lock-open"></i>
-                <h3 id="unlocked-count">0</h3>
+                <h3 id="unlocked-count">{{ unlocked_count }}</h3>
                 <p>Ready to Reveal</p>
             </div>
             <div class="stat-card">
                 <i class="fas fa-lock"></i>
-                <h3 id="locked-count">0</h3>
+                <h3 id="locked-count">{{ locked_count }}</h3>
                 <p>Still Locked</p>
             </div>
             <div class="stat-card">
                 <i class="fas fa-eye"></i>
-                <h3 id="revealed-count">0</h3>
+                <h3 id="revealed-count">{{ revealed_count }}</h3>
                 <p>Already Revealed</p>
             </div>
         </div>
@@ -694,3 +694,4 @@
     </script>
 </body>
 </html>
+

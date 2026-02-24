@@ -52,6 +52,7 @@ class DashboardApp {
                 const card = document.querySelector(`[data-message-id="${messageId}"]`);
                 if (card) {
                     card.classList.add('unlocked');
+                    card.dataset.status = 'unlocked';
                 }
 
                 // Auto-reveal if needed
@@ -128,9 +129,12 @@ class DashboardApp {
                     if (data.message_type === 'text' || data.is_binary === false) {
                         // Text message - display as formatted text
                         contentElement.innerHTML = `<h4><i class="fas fa-envelope-open"></i> Your Message:</h4><div class="revealed-text">${this.escapeHtml(data.content)}</div>`;
-                    } else if (data.message_type === 'image' || data.is_binary === true) {
+                    } else if (data.message_type === 'image') {
                         // Image - display as base64 image
                         contentElement.innerHTML = `<h4><i class="fas fa-image"></i> Your Image:</h4><img src="data:image/png;base64,${data.content}" alt="Revealed Image" class="revealed-image">`;
+                    } else if (data.message_type === 'document') {
+                        contentElement.innerHTML = `<h4><i class="fas fa-file-alt"></i> Your Document:</h4><div class="revealed-text">Your document is ready. Download started automatically.</div>`;
+                        this.triggerDownload(messageId);
                     } else {
                         // Default - just display content
                         contentElement.innerHTML = `<h4><i class="fas fa-file-alt"></i> Content:</h4><div class="revealed-text">${this.escapeHtml(data.content)}</div>`;
@@ -180,9 +184,12 @@ class DashboardApp {
                     if (data.message_type === 'text' || data.is_binary === false) {
                         // Text message - display as formatted text
                         contentElement.innerHTML = `<h4><i class="fas fa-envelope-open"></i> Your Message:</h4><div class="revealed-text">${this.escapeHtml(data.content)}</div>`;
-                    } else if (data.message_type === 'image' || data.is_binary === true) {
+                    } else if (data.message_type === 'image') {
                         // Image - display as base64 image
                         contentElement.innerHTML = `<h4><i class="fas fa-image"></i> Your Image:</h4><img src="data:image/png;base64,${data.content}" alt="Revealed Image" class="revealed-image">`;
+                    } else if (data.message_type === 'document') {
+                        contentElement.innerHTML = `<h4><i class="fas fa-file-alt"></i> Your Document:</h4><div class="revealed-text">Your document is ready. Download started automatically.</div>`;
+                        this.triggerDownload(messageId);
                     } else {
                         // Default - just display content
                         contentElement.innerHTML = `<h4><i class="fas fa-file-alt"></i> Content:</h4><div class="revealed-text">${this.escapeHtml(data.content)}</div>`;
@@ -271,15 +278,18 @@ class DashboardApp {
     // Update statistics
     updateStats() {
         const totalMessages = document.querySelectorAll('.message-card').length;
+        const unlockedMessages = document.querySelectorAll('.message-card[data-status="unlocked"]').length;
         const lockedMessages = document.querySelectorAll('.message-card[data-status="locked"]').length;
         const revealedMessages = document.querySelectorAll('.message-card[data-status="revealed"]').length;
 
         // Update stat cards if they exist
-        const totalElement = document.getElementById('stat-total');
-        const lockedElement = document.getElementById('stat-locked');
-        const revealedElement = document.getElementById('stat-revealed');
+        const totalElement = document.getElementById('total-messages');
+        const unlockedElement = document.getElementById('unlocked-count');
+        const lockedElement = document.getElementById('locked-count');
+        const revealedElement = document.getElementById('revealed-count');
 
         if (totalElement) totalElement.textContent = totalMessages;
+        if (unlockedElement) unlockedElement.textContent = unlockedMessages;
         if (lockedElement) lockedElement.textContent = lockedMessages;
         if (revealedElement) revealedElement.textContent = revealedMessages;
     }
@@ -319,6 +329,19 @@ class DashboardApp {
         return div.innerHTML;
     }
 
+    // Trigger file download without navigating away from dashboard
+    triggerDownload(messageId) {
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = `/api/download/${messageId}`;
+        document.body.appendChild(iframe);
+        setTimeout(() => {
+            if (iframe.parentNode) {
+                iframe.parentNode.removeChild(iframe);
+            }
+        }, 5000);
+    }
+
     // Cleanup on page unload
     cleanup() {
         Object.values(this.countdownIntervals).forEach(interval => {
@@ -344,3 +367,4 @@ function deleteMessage(messageId, event) {
 window.addEventListener('beforeunload', () => {
     dashboard.cleanup();
 });
+

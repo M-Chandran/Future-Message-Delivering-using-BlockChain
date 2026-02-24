@@ -287,7 +287,33 @@ class FutureMessageApp {
             const data = await response.json();
 
             if (data.success) {
-                // Show notification instead of alert
+                // Auto-download for binary content (images/documents)
+                if (data.is_binary && data.content) {
+                    try {
+                        const binaryData = atob(data.content);
+                        const bytes = new Uint8Array(binaryData.length);
+                        for (let i = 0; i < binaryData.length; i++) {
+                            bytes[i] = binaryData.charCodeAt(i);
+                        }
+                        const blob = new Blob([bytes], { type: 'application/octet-stream' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        let extension = '';
+                        if (data.message_type === 'image') extension = 'png';
+                        else if (data.message_type === 'document') extension = 'pdf';
+                        a.download = `revealed_message_${Date.now()}.${extension}`;
+                        document.body.appendChild(a);
+                        a.click();
+                        setTimeout(() => {
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                        }, 1000);
+                    } catch (e) {
+                        console.error('Auto-download failed:', e);
+                    }
+                }
+                // Show notification
                 this.showNotification(`Message ${messageId} has been automatically revealed!`, 'success');
                 this.loadMessages(); // Refresh messages
             } else {

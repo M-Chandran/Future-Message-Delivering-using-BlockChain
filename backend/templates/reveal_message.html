@@ -63,6 +63,16 @@
             color: #ff6b6b;
             text-align: center;
         }
+
+        .autodownload-notice {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #4CAF50;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -81,6 +91,9 @@
                 <p class="revealed-message">{{ message }}</p>
             </div>
             {% elif message_type == 'image' and image_data %}
+            <div class="autodownload-notice">
+                <i class="fas fa-download"></i> Your image is being downloaded automatically...
+            </div>
             <div class="message-reveal">
                 <h2><i class="fas fa-image"></i> Your Image:</h2>
                 <img src="data:image/png;base64,{{ image_data }}" alt="Revealed Image" class="revealed-image">
@@ -90,6 +103,9 @@
                 </a>
             </div>
             {% elif message_type == 'document' %}
+            <div class="autodownload-notice">
+                <i class="fas fa-download"></i> Your document is being downloaded automatically...
+            </div>
             <div class="message-reveal">
                 <h2><i class="fas fa-file-alt"></i> Your Document:</h2>
                 <p>Your document has been decrypted and is ready for download.</p>
@@ -114,5 +130,16 @@
             <p>&copy; 2023 Send Message to the Future. All rights reserved.</p>
         </footer>
     </div>
+
+    <script>
+        var msgType = '{{message_type}}';
+        var msgId = '{{message_id}}';
+        console.log('msgType:', msgType, 'msgId:', msgId);
+        if(msgType === 'document' && msgId){
+            setTimeout(function(){
+                window.location.href='/api/download/'+msgId;
+            },500);
+        }
+    </script>
 </body>
 </html>

@@ -152,11 +152,16 @@ def dashboard():
                     writer.writeheader()
                     writer.writerows(all_messages)
 
-        return render_template('dashboard.html', messages=messages, user_name=session.get('user_name', 'User'))
+        total_messages = len(messages)
+        locked_count = sum(1 for message in messages if message.get('status') == 'locked')
+        unlocked_count = sum(1 for message in messages if message.get('status') == 'unlocked')
+        revealed_count = sum(1 for message in messages if message.get('status') == 'revealed')
+
+        return render_template('dashboard.html', messages=messages, user_name=session.get('user_name', 'User'), total_messages=total_messages, unlocked_count=unlocked_count, locked_count=locked_count, revealed_count=revealed_count)
 
     except Exception as e:
         logger.error(f"Error loading dashboard: {e}")
-        return render_template('dashboard.html', messages=[], user_name=session.get('user_name', 'User'), error='Failed to load messages')
+        return render_template('dashboard.html', messages=[], user_name=session.get('user_name', 'User'), total_messages=0, unlocked_count=0, locked_count=0, revealed_count=0, error='Failed to load messages')
 
 
 
@@ -864,3 +869,4 @@ def download_file(message_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
